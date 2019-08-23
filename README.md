@@ -1,7 +1,7 @@
-#GetCleanData-repo
+# GetCleanData-repo
 Repo for the course project to get and clean a dataset
 
-#Analysis
+# Analysis
 ##The Script
 The entire analysis is performed by the "run_analysis.R" script.  It generates two
 data objects, both data frames, called "firstTidyDataset" and "secondTidyDataset".
