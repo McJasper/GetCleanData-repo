@@ -128,3 +128,4 @@ firstTidyDataset$SubjectId <- factor(paste0("Subject", unlist(firstTidyDataset$S
 secondTidyDataset <- group_by(.data = firstTidyDataset, SubjectId, Activity)
 secondTidyDataset <- summarise_all(secondTidyDataset, mean)
 
+write.table(x = secondTidyDataset, file = "secondTidyDataset.txt", row.names = F)
