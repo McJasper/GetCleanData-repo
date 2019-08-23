@@ -1,7 +1,7 @@
 # Clear environment
 rm(list=ls())
 
-setwd("D:/Programming Exercises/Coursera/Getting and Cleaning Data/Programming Exercise")
+setwd("XXXX Your working directory here XXXX")
 
 # Load Dependencies
 library(dplyr)
@@ -39,6 +39,8 @@ xTestData <- read.table(file = xTestDatafile, header = F)
 yTestDatafile <- unzip(zipfile = "zipData.zip", files = "UCI HAR Dataset/test/y_test.txt")
 yTestData <- unlist(read.table(file = yTestDatafile))
 
+rm(xTestDatafile, yTestDatafile)
+
 # Assign column annotations to test data
 colnames(xTestData) <- featureNames
 
@@ -49,8 +51,9 @@ xTestData$RowAnnotation <- yTestData
 xTestData$SubjectId <- testSubjectsVector$SubjectId
 
 # Get Train subject list
-trainSubjectVector <- read.table(unzip(zipfile = "zipData.zip", files = "UCI HAR Dataset/train/subject_train.txt"), 
-                            col.names = "SubjectId")
+trainSubjectVector <- read.table(unzip(zipfile = "zipData.zip", 
+                                       files = "UCI HAR Dataset/train/subject_train.txt"), 
+                                 col.names = "SubjectId")
 
 # Get Train data
 xTrainDatafile <- unzip(zipfile = "zipData.zip", files = "UCI HAR Dataset/train/X_train.txt")
@@ -58,6 +61,8 @@ xTrainData <- read.table(file = xTrainDatafile, header = F)
 # Get train data annotations
 yTrainDatafile <- unzip(zipfile = "zipData.zip", files = "UCI HAR Dataset/train/y_train.txt")
 yTrainData <- unlist(read.table(file = yTrainDatafile))
+
+rm(xTrainDatafile, yTrainDatafile)
 
 # Assign column annotations to training data
 colnames(xTrainData) <- featureNames 
@@ -67,13 +72,13 @@ xTrainData$RowAnnotation <- yTrainData
 # Indicate Subject
 xTrainData$SubjectId <- trainSubjectVector$SubjectId
 
-rm(trainSubjectVector, testSubjectsVector)
+rm(trainSubjectVector, testSubjectsVector, featureNames)
 
 #~~~~~~~~~~~~~~~~~
 # **FOR GRADERS** Here is where point #2 is performed:
 # Extracts only the measurements on the mean and standard deviation for each measurement.
-testDataSelection <- select(.data = xTestData, matches("mean|std|RowAnnotation|SubjectId"))
-trainDataSelection <- select(.data = xTrainData, matches("mean|std|RowAnnotation|SubjectId"))
+testDataSelection <- select(.data = xTestData, matches("mean|std|RowAnnotation|SubjectId", ignore.case = F))
+trainDataSelection <- select(.data = xTrainData, matches("mean|std|RowAnnotation|SubjectId", ignore.case = F))
 
 rm(xTestData, xTrainData, yTestData, yTrainData)
 #~~~~~~~~~~~~~~~~~
@@ -94,6 +99,7 @@ rm(testDataSelection, trainDataSelection)
 activityConverter <- as.vector(unlist(read.table("UCI HAR Dataset/activity_labels.txt")[2]))
 firstTidyDataset$Activity <- factor(activityConverter[firstTidyDataset$RowAnnotation], ordered = T)
 firstTidyDataset<- firstTidyDataset[,-which(colnames(firstTidyDataset) == "RowAnnotation")]
+rm(activityConverter)
 
 #~~~~~~~~~~~~~~~~~
 # **FOR GRADERS** Here is where point #4 is performed:
@@ -109,10 +115,11 @@ names(firstTidyDataset) <- gsub(pattern = "Gyro", replacement = "Gyroscope", x =
   # Substitute 'Mag' for Magnitude
 names(firstTidyDataset) <- gsub(pattern = "Mag", replacement = "Magnitude", x = names(firstTidyDataset))
   # Lastly, substitute 'f' for Fourier Transformed values
-names(firstTidyDataset) <- gsub(pattern = "^f", replacement = "Fourier", x = names(firstTidyDataset))
+names(firstTidyDataset) <- gsub(pattern = "^f", replacement = "fourier", x = names(firstTidyDataset))
 
 # Make more meaningful Subject Ids as a factor
-firstTidyDataset$SubjectId <- factor(paste0("Subject", unlist(firstTidyDataset$SubjectId)))
+firstTidyDataset$SubjectId <- factor(paste0("Subject", unlist(firstTidyDataset$SubjectId)), 
+                                     levels = paste0("Subject", 1:length(unique(unlist(firstTidyDataset$SubjectId)))))
 
 #~~~~~~~~~~~~~~~~~
 # **FOR GRADERS** Here is where point #5 is performed:
@@ -120,9 +127,4 @@ firstTidyDataset$SubjectId <- factor(paste0("Subject", unlist(firstTidyDataset$S
 # average of each variable for each activity and each subject.
 secondTidyDataset <- group_by(.data = firstTidyDataset, SubjectId, Activity)
 secondTidyDataset <- summarise_all(secondTidyDataset, mean)
-
-
-
-
-
 
